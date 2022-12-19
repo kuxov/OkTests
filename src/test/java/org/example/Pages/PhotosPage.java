@@ -10,9 +10,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-import static org.example.Tests.PhotosTest.driver;
+public class PhotosPage extends BasePage{
 
-public class PhotosPage {
+    public WebDriver driver;
     @FindBy(xpath = "//*[contains(@class, 'button-pro __sec __small')]")
     public WebElement createPhotoAlbum;
 
@@ -24,26 +24,34 @@ public class PhotosPage {
 
     @FindBy(xpath = "//*[contains(@id, 'field_query')]")
     public WebElement searchField;
+
+    @FindBy(xpath = "//*[contains(text(), 'Альбом пуст')]")
+    public WebElement albumIsEmptyMsg;
+
+    @FindBy(xpath = "//*[contains(text(), 'Таких альбомов не найдено')]")
+    public WebElement noAlbumsMsg;
+
     public PhotosPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
-    }
+        this.driver = driver;
+        check();}
 
     public void inputSearchTitle()
     {
-        new WebDriverWait(driver, Duration.ofSeconds(3)).until(ExpectedConditions.visibilityOf(searchField));
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(searchField));
         searchField.sendKeys("test2");
     }
 
     public boolean albumFound()
     {
-        WebElement element = new WebDriverWait(driver, Duration.ofSeconds(3))
-                .until(driver -> driver.findElement(By.xpath("//*[contains(text(), 'test2') and not (contains(@id, 'field_query'))]")));
+        WebElement element =
+                new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(noAlbumsMsg));
         return element != null;
     }
     public boolean albumIsEmpty()
     {
-        WebElement element = new WebDriverWait(driver, Duration.ofSeconds(3))
-                .until(driver -> driver.findElement(By.xpath("//*[contains(text(), 'Альбом пуст')]")));
+        WebElement element =
+                new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(albumIsEmptyMsg));
         return element != null;
     }
 
@@ -63,6 +71,18 @@ public class PhotosPage {
 
     public void createAlbum()
     {
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(ExpectedConditions.visibilityOf(confirm));
         confirm.click();
+    }
+
+    @Override
+    protected void check() {
+        new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(createPhotoAlbum));
+        if(createPhotoAlbum.isDisplayed()) {System.out.println("create album button is visible");}
+
+        new WebDriverWait(driver, Duration.ofSeconds(1)).until(ExpectedConditions.visibilityOf(searchField));
+        if(searchField.isDisplayed()) {System.out.println("search field is visible");}
+
+        System.out.println("\n");
     }
 }
